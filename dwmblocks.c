@@ -1,10 +1,11 @@
-#include<stdlib.h>
-#include<stdio.h>
-#include<string.h>
-#include<unistd.h>
-#include<signal.h>
-#include<X11/Xlib.h>
-#define LENGTH(X)               (sizeof(X) / sizeof (X[0]))
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
+#include <X11/Xlib.h>
+
+#define LENGTH(X) (sizeof(X) / sizeof (X[0]))
 
 typedef struct {
 	char* icon;
@@ -12,6 +13,7 @@ typedef struct {
 	unsigned int interval;
 	unsigned int signal;
 } Block;
+
 void sighandler(int num);
 void replace(char *str, char old, char new);
 void getcmds(int time);
@@ -20,10 +22,8 @@ void setupsignals();
 void getstatus(char *str);
 void setroot();
 void statusloop();
-void statusinit();
 void sighandler(int signum);
 void termhandler(int signum);
-
 
 #include "config.h"
 
@@ -37,38 +37,44 @@ static int statusContinue = 1;
 void replace(char *str, char old, char new)
 {
 	int N = strlen(str);
-	for(int i = 0; i < N; i++)
+	for (int i = 0; i < N; i++)
 		if(str[i] == old)
 			str[i] = new;
 }
 
-//opens process *cmd and stores output in *output
+// opens process *cmd and stores output in *output
 void getcmd(const Block *block, char *output)
 {
-	strcpy(output, block->icon);
-	char *cmd = block->command;
-	FILE *cmdf = popen(cmd,"r");
+	FILE *cmdf = popen(block->command, "r");
+
 	if (!cmdf)
 		return;
-	//int N = strlen(output);
+
 	char c;
 	int i = strlen(block->icon);
+
+	strcpy(output, block->icon);
+
 	while((c = fgetc(cmdf)) != EOF)
 		output[i++] = c;
+
+	pclose(cmdf);
+
 	if (delim != '\0' && --i)
 		output[i++] = delim;
+
 	output[i++] = '\0';
-	pclose(cmdf);
 }
 
 void getcmds(int time)
 {
 	const Block* current;
-	for(int i = 0; i < LENGTH(blocks); i++)
-	{	
+
+	for (int i = 0; i < LENGTH(blocks); i++)
+	{
 		current = blocks + i;
 		if ((current->interval != 0 && time % current->interval == 0) || time == -1)
-			getcmd(current,statusbar[i]);
+			getcmd(current, statusbar[i]);
 	}
 }
 
@@ -79,16 +85,16 @@ void getsigcmds(int signal)
 	{
 		current = blocks + i;
 		if (current->signal == signal)
-			getcmd(current,statusbar[i]);
+			getcmd(current, statusbar[i]);
 	}
 }
 
 void setupsignals()
 {
-	for(int i = 0; i < LENGTH(blocks); i++)
-	{	  
+	for (int i = 0; i < LENGTH(blocks); i++)
+	{
 		if (blocks[i].signal > 0)
-			signal(SIGRTMIN+blocks[i].signal, sighandler);
+			signal(SIGRTMIN + blocks[i].signal, sighandler);
 	}
 
 }
@@ -96,22 +102,24 @@ void setupsignals()
 void getstatus(char *str)
 {
 	int j = 0;
-	for(int i = 0; i < LENGTH(blocks); j+=strlen(statusbar[i++]))
-	{	
+
+	for (int i = 0; i < LENGTH(blocks); j += strlen(statusbar[i++]))
+	{
 		strcpy(str + j, statusbar[i]);
 	}
 	str[--j] = '\0';
-
 }
 
 void setroot()
 {
 	Display *d = XOpenDisplay(NULL);
-	if (d) {
+
+	if (d)
 		dpy = d;
-	}
+
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
+
 	getstatus(statusstr);
 	XStoreName(dpy, root, statusstr);
 	XCloseDisplay(dpy);
@@ -120,9 +128,11 @@ void setroot()
 
 void statusloop()
 {
-	setupsignals();
 	int i = 0;
+
+	setupsignals();
 	getcmds(-1);
+
 	while(statusContinue)
 	{
 		getcmds(i);
@@ -132,15 +142,9 @@ void statusloop()
 	}
 }
 
-void statusinit()
-{
-	statusloop();
-}
-
-
 void sighandler(int signum)
 {
-	getsigcmds(signum-SIGRTMIN);
+	getsigcmds(signum - SIGRTMIN);
 	setroot();
 }
 
@@ -152,12 +156,15 @@ void termhandler(int signum)
 
 int main(int argc, char** argv)
 {
-	for(int i = 0; i < argc; i++)
-	{	
-		if (!strcmp("-d",argv[i]))
+	for (int i = 0; i < argc; i++)
+	{
+		// TODO: document arguments
+		// TODO: consider string delimiter
+		if (!strcmp("-d", argv[i]))
 			delim = argv[++i][0];
 	}
+
 	signal(SIGTERM, termhandler);
 	signal(SIGINT, termhandler);
-	statusinit();
+	statusloop();
 }

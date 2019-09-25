@@ -20,7 +20,10 @@ options:
 .c.o:
 	${CC} -c ${CFLAGS} $<
 
-${OBJ}: blocks.h
+${OBJ}: config.h
+
+config.h:
+	cp config.def.h $@
 
 dwmblocks: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDFLAGS}

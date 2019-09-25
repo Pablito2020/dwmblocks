@@ -25,7 +25,7 @@ void sighandler(int signum);
 void termhandler(int signum);
 
 
-#include "blocks.h"
+#include "config.h"
 
 static Display *dpy;
 static int screen;

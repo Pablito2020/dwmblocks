@@ -31,6 +31,8 @@ The statusbar is made from text output from commandline programs.
 For example, the audio module has the update signal 10 by default.
 Thus, running `pkill -RTMIN+10 dwmblocks` will update it.
 
-## Credits
+## Remotes
 
-<https://github.com/torrinfail/dwmblocks>
+```sh
+git remote add upstream https://github.com/torrinfail/dwmblocks
+```

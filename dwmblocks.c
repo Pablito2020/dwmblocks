@@ -5,6 +5,9 @@
 #include <signal.h>
 #include <X11/Xlib.h>
 
+#define MAX_BLOCK 50
+#define MAX_DELIM 4
+#define MAX_ICO 10
 #define LENGTH(X) (sizeof(X) / sizeof (X[0]))
 
 typedef struct {
@@ -29,8 +32,7 @@ void termhandler(int signum);
 static Display *dpy;
 static int screen;
 static Window root;
-static char statusbar[LENGTH(blocks)][50] = {0};
-static char statusstr[256];
+static char statusbar[LENGTH(blocks)][MAX_BLOCK] = { 0 };
 static int statusContinue = 1;
 
 // opens process *cmd and stores output in *output
@@ -41,20 +43,28 @@ void getcmd(const Block *block, char *output)
 	if (!cmdf)
 		return;
 
-	char c;
-	int i = strlen(block->icon);
+	int len_ico = strlen(block->icon);
 
-	strcpy(output, block->icon);
+	if (len_ico > MAX_ICO)
+		len_ico = MAX_ICO;
 
-	while((c = fgetc(cmdf)) != EOF)
-		output[i++] = c;
+	memmove(output, block->icon, len_ico);
+	output[len_ico] = 0;
 
+	int x = MAX_BLOCK - strlen(output) - strlen(delim);
+	char *buf;
+
+	buf = (char*) malloc(x);
+	fgets(buf, x, cmdf);
+
+	if (buf[strlen(buf) - 1] == '\n')
+		buf[strlen(buf) - 1] = 0;
+
+	strcat(output, buf);
+	free(buf);
 	pclose(cmdf);
 
-	if (delim != '\0' && --i)
-		output[i++] = delim;
-
-	output[i++] = '\0';
+	strcat(output, delim);
 }
 
 void getcmds(int time)
@@ -94,15 +104,18 @@ void getstatus(char *str)
 {
 	int j = 0;
 
-	for (int i = 0; i < LENGTH(blocks); j += strlen(statusbar[i++]))
-	{
+	for (int i = 0; i < LENGTH(blocks); j += strlen(statusbar[i++])) {
 		strcpy(str + j, statusbar[i]);
 	}
-	str[--j] = '\0';
+
+	// Remove last delimiter
+	str[strlen(str) - strlen(delim)] = '\0';
 }
 
 void setroot()
 {
+	char *statusstr;
+
 	Display *d = XOpenDisplay(NULL);
 
 	if (d)
@@ -111,8 +124,10 @@ void setroot()
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
 
+	statusstr = (char*) malloc(LENGTH(blocks) * MAX_BLOCK);
 	getstatus(statusstr);
 	XStoreName(dpy, root, statusstr);
+	free(statusstr);
 	XCloseDisplay(dpy);
 }
 
@@ -147,12 +162,8 @@ void termhandler(int signum)
 
 int main(int argc, char** argv)
 {
-	for (int i = 0; i < argc; i++)
-	{
-		// TODO: document arguments
-		// TODO: consider string delimiter
-		if (!strcmp("-d", argv[i]))
-			delim = argv[++i][0];
+	if (strlen(delim) > MAX_DELIM - 1) {
+		delim[MAX_DELIM] = 0;
 	}
 
 	signal(SIGTERM, termhandler);

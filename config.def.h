@@ -3,5 +3,5 @@ static const Block blocks[] = {
 	{ "", "date", 60, 0 },
 };
 
-// Sets delimeter between status commands. NULL character ('\0') means no delimeter.
-static char delim = ' ';
+// Sets delimeter between status commands.
+static char delimi[] = "  ";

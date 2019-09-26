@@ -15,7 +15,6 @@ typedef struct {
 } Block;
 
 void sighandler(int num);
-void replace(char *str, char old, char new);
 void getcmds(int time);
 void getsigcmds(int signal);
 void setupsignals();
@@ -33,14 +32,6 @@ static Window root;
 static char statusbar[LENGTH(blocks)][50] = {0};
 static char statusstr[256];
 static int statusContinue = 1;
-
-void replace(char *str, char old, char new)
-{
-	int N = strlen(str);
-	for (int i = 0; i < N; i++)
-		if(str[i] == old)
-			str[i] = new;
-}
 
 // opens process *cmd and stores output in *output
 void getcmd(const Block *block, char *output)

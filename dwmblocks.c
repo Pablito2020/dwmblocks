@@ -60,6 +60,11 @@ void getcmd(const Block *block, char *output)
 	if (buf[strlen(buf) - 1] == '\n')
 		buf[strlen(buf) - 1] = 0;
 
+	if (!strlen(buf)) {
+		output[0] = 0;
+		return;
+	}
+
 	strcat(output, buf);
 	free(buf);
 	pclose(cmdf);

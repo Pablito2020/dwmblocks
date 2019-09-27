@@ -4,4 +4,4 @@ static const Block blocks[] = {
 };
 
 // Sets delimeter between status commands.
-static char delimi[] = "  ";
+static char delim[] = "  ";

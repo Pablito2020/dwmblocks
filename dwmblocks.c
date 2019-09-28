@@ -1,5 +1,3 @@
-// btw i love python
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

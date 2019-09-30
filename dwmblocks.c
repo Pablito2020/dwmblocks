@@ -51,22 +51,22 @@ void getcmd(const Block *block, char *output)
 	int x = MAX_BLOCK - strlen(output) - strlen(delim);
 	char *buf;
 
-	buf = (char*) malloc(x);
+	buf = (char*) calloc(1, x);
 	fgets(buf, x, cmdf);
+	int lenbuf = strlen(buf);
 
-	if (buf[strlen(buf) - 1] == '\n')
+	if (lenbuf && (buf[lenbuf - 1] == '\n'))
 		buf[strlen(buf) - 1] = 0;
 
-	if (!strlen(buf)) {
-		output[0] = 0;
-		return;
+	if (lenbuf) {
+		strcat(output, buf);
+		strcat(output, delim);
+	} else {
+		output[0] = '\0';
 	}
 
-	strcat(output, buf);
 	free(buf);
 	pclose(cmdf);
-
-	strcat(output, delim);
 }
 
 void getcmds(int time)

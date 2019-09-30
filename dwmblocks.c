@@ -29,9 +29,6 @@ void termhandler(int signum);
 
 #include "config.h"
 
-static Display *dpy;
-static int screen;
-static Window root;
 static char statusbar[LENGTH(blocks)][MAX_BLOCK] = { 0 };
 static int statusContinue = 1;
 
@@ -121,13 +118,9 @@ void setroot()
 {
 	char *statusstr;
 
-	Display *d = XOpenDisplay(NULL);
-
-	if (d)
-		dpy = d;
-
-	screen = DefaultScreen(dpy);
-	root = RootWindow(dpy, screen);
+	Display *dpy = XOpenDisplay(NULL);
+	int screen = DefaultScreen(dpy);
+	Window root = RootWindow(dpy, screen);
 
 	statusstr = (char*) malloc(LENGTH(blocks) * MAX_BLOCK);
 	getstatus(statusstr);

@@ -1,3 +1,5 @@
+// BTW, i love PYTHON
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

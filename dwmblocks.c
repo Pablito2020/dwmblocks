@@ -1,17 +1,22 @@
+#include <locale.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include <signal.h>
+#include <time.h>
+#include <unistd.h>
 #include <X11/Xlib.h>
 
 #define MAX_BLOCK 50
-#define MAX_DELIM 4
+#define MAX_DELIM 5
 #define MAX_ICO 10
 #define LENGTH(X) (sizeof(X) / sizeof (X[0]))
 
+#define ERR_DELIM 1
+
 typedef struct {
 	char* icon;
+	unsigned int command_native;
 	char* command;
 	unsigned int interval;
 	unsigned int signal;
@@ -29,45 +34,86 @@ void termhandler(int signum);
 
 #include "config.h"
 
+#ifndef LOCALE
+#define LOCALE "C"
+#endif
+
+#ifndef TIME_FORMAT
+#define TIME_FORMAT "%c"
+#endif
+
 static char statusbar[LENGTH(blocks)][MAX_BLOCK] = { 0 };
 static int statusContinue = 1;
 
-/* opens process *cmd and stores output in *output */
-void
-getcmd(const Block *block, char *output)
+int
+block_time(const Block *block, char *output, unsigned int len)
 {
+	time_t now = time(0);
+	unsigned int max_len = MAX_BLOCK - len - sizeof(delim) + 1;
+
+	if(!strftime(output + len, max_len, TIME_FORMAT, localtime(&now))) {
+		output[max_len+len] = '\0';
+	}
+
+	return 0;
+}
+
+int
+getico(const Block *block, char *output) {
+	int len = strlen(block->icon);
+
+	/* truncate icon */
+	if (len > MAX_ICO)
+		len = MAX_ICO;
+
+	memmove(output, block->icon, len);
+	output[len] = '\0';
+
+	return len;
+}
+
+int
+external_cmd(const Block *block, char *output, unsigned int len) {
+	char *buf;
 	FILE *cmdf = popen(block->command, "r");
 
 	if (!cmdf)
-		return;
+		return 1;
 
-	int len_ico = strlen(block->icon);
-
-	if (len_ico > MAX_ICO)
-		len_ico = MAX_ICO;
-
-	memmove(output, block->icon, len_ico);
-	output[len_ico] = 0;
-
-	int x = MAX_BLOCK - strlen(output) - strlen(delim);
-	char *buf;
+	int x = MAX_BLOCK - len - sizeof(delim) + 1;
 
 	buf = (char*) calloc(1, x);
 	fgets(buf, x, cmdf);
 	int lenbuf = strlen(buf);
 
 	if (lenbuf && (buf[lenbuf - 1] == '\n'))
-		buf[strlen(buf) - 1] = 0;
+		buf[lenbuf - 1] = 0;
 
-	if (lenbuf) {
-		strcat(output, buf);
-		strcat(output, delim);
-	} else {
-		output[0] = '\0';
-	}
+	strcat(output, buf);
 
 	free(buf);
 	pclose(cmdf);
+
+	return lenbuf ? 0 : 1;
+}
+
+/* opens process *cmd and stores output in *output */
+void
+getcmd(const Block *block, char *output)
+{
+	int hide = 0;
+
+	unsigned int len = getico(block, output);
+
+	if (block->command_native == CMD_TIME)
+		hide = block_time(block, output, len);
+	else
+		hide = external_cmd(block, output, len);
+
+	if (hide)
+		output[0] = '\0';
+	else
+		strcat(output, delim);
 }
 
 void
@@ -100,7 +146,6 @@ setupsignals()
 		if (blocks[i].signal > 0)
 			signal(SIGRTMIN + blocks[i].signal, sighandler);
 	}
-
 }
 
 void
@@ -113,7 +158,7 @@ getstatus(char *str)
 	}
 
 	/* Remove last delimiter */
-	str[strlen(str) - strlen(delim)] = '\0';
+	str[strlen(str) - sizeof(delim) + 1] = '\0';
 }
 
 void
@@ -131,7 +176,6 @@ setroot()
 	free(statusstr);
 	XCloseDisplay(dpy);
 }
-
 
 void
 statusloop()
@@ -160,16 +204,18 @@ void
 termhandler(int signum)
 {
 	statusContinue = 0;
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 int
 main(int argc, char** argv)
 {
-	if (strlen(delim) > MAX_DELIM - 1) {
-		delim[MAX_DELIM] = 0;
+	if (sizeof(delim) > MAX_DELIM) {
+		fprintf(stderr, "err: delim too long (max: %d).\n", MAX_DELIM - 1);
+		return ERR_DELIM;
 	}
 
+	setlocale(LC_TIME, LOCALE);
 	signal(SIGTERM, termhandler);
 	signal(SIGINT, termhandler);
 	statusloop();

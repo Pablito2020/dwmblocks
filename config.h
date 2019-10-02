@@ -3,6 +3,7 @@
 
 /* Native commands */
 #define CMD_TIME 1
+#define CMD_LOAD 2
 
 /*
  * You can use external or native commands for the blocks.
@@ -15,8 +16,8 @@ static const Block blocks[] = {
 	{ "", 0, "kb", 0, 1 },
 	{ "M: ", 0, "mailchk -l", 0, 2 },
 	{ "♪: ", 0, "amixer get Master | grep -o \"\\(\\[off\\]\\|[0-9]*%\\)\"", 0, 10 },
-	{ "", 0, "cut -d ' ' -f1-3 /proc/loadavg", 10, 0 },
 	{ "", 0, "free -h | awk '/^Mem/ { print $3\"/\"$2 }' | sed s/i//g", 30, 0 },
+	{ "", CMD_LOAD, 0, 10, 0 },
 	{ "", CMD_TIME, 0, 60, 0 }
 };
 

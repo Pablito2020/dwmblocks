@@ -46,7 +46,7 @@ static char statusbar[LENGTH(blocks)][MAX_BLOCK] = { 0 };
 static int statusContinue = 1;
 
 int
-block_time(const Block *block, char *output, unsigned int len)
+block_time(char *output, unsigned int len)
 {
 	time_t now = time(0);
 	unsigned int max_len = MAX_BLOCK - len - sizeof(delim) + 1;
@@ -59,7 +59,24 @@ block_time(const Block *block, char *output, unsigned int len)
 }
 
 int
-getico(const Block *block, char *output) {
+block_load(char *output, unsigned int len)
+{
+	double avgs[3];
+	char buf[15] = { 0 };
+
+	if (getloadavg(avgs, 3) < 0)
+		return 1;
+
+	snprintf(buf, 15, "%.2f %.2f %.2f", avgs[0], avgs[1], avgs[2]);
+
+	strcat(output, buf);
+
+	return 0;
+}
+
+int
+getico(const Block *block, char *output)
+{
 	int len = strlen(block->icon);
 
 	/* truncate icon */
@@ -106,7 +123,9 @@ getcmd(const Block *block, char *output)
 	unsigned int len = getico(block, output);
 
 	if (block->command_native == CMD_TIME)
-		hide = block_time(block, output, len);
+		hide = block_time(output, len);
+	else if (block->command_native == CMD_LOAD)
+		hide = block_load(output, len);
 	else
 		hide = external_cmd(block, output, len);
 

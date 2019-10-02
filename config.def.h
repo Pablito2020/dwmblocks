@@ -3,6 +3,7 @@
 
 /* Native commands */
 #define CMD_TIME 1
+#define CMD_LOAD 2
 
 /*
  * You can use external or native commands for the blocks.
@@ -12,8 +13,9 @@
 
 static const Block blocks[] = {
 	/* icon / native command / external command / update interval / update signal */
-	{ "TIME: ", 0, "date '+%H:%M'", 60, 0 },
-	{ "", CMD_TIME, 0, 5, 0 }
+	{ "", CMD_LOAD, 0, 10, 0 },
+	{ "", CMD_TIME, 0, 60, 0 },
+	{ "TIME: ", 0, "date '+%H:%M'", 60, 0 }
 };
 
 /* Sets delimeter between status commands */

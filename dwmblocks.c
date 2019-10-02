@@ -32,8 +32,9 @@ void termhandler(int signum);
 static char statusbar[LENGTH(blocks)][MAX_BLOCK] = { 0 };
 static int statusContinue = 1;
 
-// opens process *cmd and stores output in *output
-void getcmd(const Block *block, char *output)
+/* opens process *cmd and stores output in *output */
+void
+getcmd(const Block *block, char *output)
 {
 	FILE *cmdf = popen(block->command, "r");
 
@@ -69,40 +70,41 @@ void getcmd(const Block *block, char *output)
 	pclose(cmdf);
 }
 
-void getcmds(int time)
+void
+getcmds(int time)
 {
 	const Block* current;
 
-	for (int i = 0; i < LENGTH(blocks); i++)
-	{
+	for (int i = 0; i < LENGTH(blocks); i++) {
 		current = blocks + i;
 		if ((current->interval != 0 && time % current->interval == 0) || time == -1)
 			getcmd(current, statusbar[i]);
 	}
 }
 
-void getsigcmds(int signal)
+void
+getsigcmds(int signal)
 {
 	const Block *current;
-	for (int i = 0; i < LENGTH(blocks); i++)
-	{
+	for (int i = 0; i < LENGTH(blocks); i++) {
 		current = blocks + i;
 		if (current->signal == signal)
 			getcmd(current, statusbar[i]);
 	}
 }
 
-void setupsignals()
+void
+setupsignals()
 {
-	for (int i = 0; i < LENGTH(blocks); i++)
-	{
+	for (int i = 0; i < LENGTH(blocks); i++) {
 		if (blocks[i].signal > 0)
 			signal(SIGRTMIN + blocks[i].signal, sighandler);
 	}
 
 }
 
-void getstatus(char *str)
+void
+getstatus(char *str)
 {
 	int j = 0;
 
@@ -110,11 +112,12 @@ void getstatus(char *str)
 		strcpy(str + j, statusbar[i]);
 	}
 
-	// Remove last delimiter
+	/* Remove last delimiter */
 	str[strlen(str) - strlen(delim)] = '\0';
 }
 
-void setroot()
+void
+setroot()
 {
 	char *statusstr;
 
@@ -130,15 +133,15 @@ void setroot()
 }
 
 
-void statusloop()
+void
+statusloop()
 {
 	int i = 0;
 
 	setupsignals();
 	getcmds(-1);
 
-	while(statusContinue)
-	{
+	while(statusContinue) {
 		getcmds(i);
 		setroot();
 		sleep(1.0);
@@ -146,19 +149,22 @@ void statusloop()
 	}
 }
 
-void sighandler(int signum)
+void
+sighandler(int signum)
 {
 	getsigcmds(signum - SIGRTMIN);
 	setroot();
 }
 
-void termhandler(int signum)
+void
+termhandler(int signum)
 {
 	statusContinue = 0;
 	exit(0);
 }
 
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
 	if (strlen(delim) > MAX_DELIM - 1) {
 		delim[MAX_DELIM] = 0;

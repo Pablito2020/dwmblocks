@@ -13,13 +13,10 @@
 
 static const Block blocks[] = {
 	/* icon / native command / external command / update interval / update signal */
-	{ "", 0, "kb", 0, 1 },
-	{ "M: ", 0, "mailchk -l", 0, 2 },
-	{ "♪: ", 0, "amixer get Master | grep -o \"\\(\\[off\\]\\|[0-9]*%\\)\"", 0, 10 },
-	{ "", 0, "free -h | awk '/^Mem/ { print $3\"/\"$2 }' | sed s/i//g", 30, 0 },
-	{ "", CMD_LOAD, 0, 10, 0 },
-	{"B: ", 0, "[ $(ls -1 /sys/class/power_supply | wc -l) = 0 ] || sed \"s/$/%/\" /sys/class/power_supply/BAT?/capacity", 60, 0},
-	{ "", CMD_TIME, 0, 60, 0 }
+	{ "♪: ",        0, "pamixer --get-volume-human",    0,              10 },
+	{ "⌨ ",        0, "get_keyboard",                  0,              10 },
+	{ "",           0, "free -h | awk '/^Mem/ { print $3\"/\"$2 }' | sed s/i//g", 30, 0 },
+	{ "",        CMD_TIME,            0,                60,             0 }
 };
 
 /* Sets delimeter between status commands */

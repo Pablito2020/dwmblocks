@@ -13,11 +13,12 @@
 
 static const Block blocks[] = {
 	/* icon / native command / external command / update interval / update signal */
-	{ "♪: ",        0,          "pamixer --get-volume-human",    0,              10 },
+	{ "🐧 ",        0,          "uname -r",    0,              10 },
+	{ "🌡 ",      0,          "sensors | awk '/Core 0/{print $3}'",    5,              0 },
+	{ "♪ ",        0,          "pamixer --get-volume-human",    0,              10 },
 	{ "⌨ ",         0,          "get_keyboard",                  0,              12 },
-	{ "",           0, "free -h | awk '/^Mem/ { print $3\"/\"$2 }' | sed s/i//g", 30, 9 },
 	{ "",        CMD_TIME,            0,                60,             9 }
 };
 
 /* Sets delimeter between status commands */
-static char delim[] = "  ";
+static char delim[] = " | ";

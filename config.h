@@ -13,7 +13,7 @@
 
 static const Block blocks[] = {
 	/* icon /   native command  /       external command        /update interval / update signal */
-	{ "🐧 ",        0,          "uname -r",                              0,              10 },
+	{ " ",        0,          "uname -r",                              0,              10 },
 	{ "🌡 ",         0,          "sensors | awk '/Core 0/{print $3}'",    5,              0 },
 	{ "♪ ",         0,          "pamixer --get-volume-human",            0,              10 },
 	{ "⌨ ",         0,          "get_keyboard",                          0,              12 },

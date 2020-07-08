@@ -13,7 +13,7 @@
 
 static const Block blocks[] = {
 	/* icon /   native command  /       external command                      /update interval / update signal */
-	{ "🔋 ",        0,          "cat /sys/class/power_supply/BAT1/capacity ",       10,              1 },
+	{ "⚡ ",        0,          "cat /sys/class/power_supply/BAT1/capacity ",       10,              1 },
 	{ "♪ ",         0,          "pamixer --get-volume-human",                      0,              10 },
 	{ "⌨ ",         0,          "get_keyboard",                                    0,              12 },
 	{ "",        CMD_TIME,            0,                                           60,             9 }

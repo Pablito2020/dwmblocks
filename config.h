@@ -12,12 +12,12 @@
  */
 
 static const Block blocks[] = {
-	/* icon /   native command  /       external command        /update interval / update signal */
-	{ " ",        0,          "uname -r",                              0,              10 },
-	{ "🌡 ",         0,          "sensors | awk '/Core 0/{print $3}'",    5,              0 },
-	{ "♪ ",         0,          "pamixer --get-volume-human",            0,              10 },
-	{ "⌨ ",         0,          "get_keyboard",                          0,              12 },
-	{ "",        CMD_TIME,            0,                                 60,             9 }
+	/* icon /   native command  /       external command                /update interval / update signal */
+	{ " ",        0,          "uname -r",                                       0,              10 },
+	{ "🌡 ",         0,         "sensors | awk '/Package id 0/{print $4}'",       5,              0 },
+	{ "♪ ",         0,          "pamixer --get-volume-human",                    0,              10 },
+	{ "⌨ ",         0,          "get_keyboard",                                  0,              12 },
+	{ "",        CMD_TIME,            0,                                         60,             9 }
 };
 
 /* Sets delimeter between status commands */

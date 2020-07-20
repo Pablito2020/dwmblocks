@@ -1,5 +1,5 @@
 #define LOCALE "" /* Use empty string for default system locale  */
-#define TIME_FORMAT "%a %b %d %H:%M" /* Used for CMD_TIME */
+#define TIME_FORMAT "%I:%M" /* Used for CMD_TIME */
 
 /* Native commands */
 #define CMD_TIME 1
@@ -13,11 +13,13 @@
 
 static const Block blocks[] = {
 	/* icon /   native command  /       external command                /update interval / update signal */
-	{ " ",        0,          "uname -r",                                       0,              10 },
-	{ "🌡 ",        0,         "sensors | awk '/Package id 0/{print $4}'",        1,               0 },
-	{ "♪ ",        0,          "pamixer --get-volume-human",                     0,              10 },
-	{ "⌨ ",        0,          "get_keyboard",                                   0,              12 },
-	{ "",        CMD_TIME,            0,                                         60,             9 }
+	{ "",          0,          "~/scripts/dwmblocks/kernel_version",             0,               1 },
+	{ "",          0,          "~/scripts/dwmblocks/sensors",                    1,               0 },
+	{ "",          0,          "~/scripts/dwmblocks/volume",                     0,              10 },
+	{ "",          0,          "~/scripts/dwmblocks/keyboard_info",              0,              12 },
+	{ " ",        CMD_TIME,            0,                                       60,              2 },
+	{ "",          0,          "~/scripts/dwmblocks/date",                       0,               3 }
+
 };
 
 /* Sets delimeter between status commands */

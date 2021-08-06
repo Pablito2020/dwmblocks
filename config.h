@@ -13,12 +13,12 @@
 
 static const Block blocks[] = {
 	/* icon /   native command  /       external command                /update interval / update signal */
-	{ "",          0,          "~/scripts/dwmblocks/kernel_version",             0,               1 },
-	{ "",          0,          "~/scripts/dwmblocks/sensors",                    1,               0 },
-	{ "",          0,          "~/scripts/dwmblocks/volume",                     0,              10 },
-	{ "",          0,          "~/scripts/dwmblocks/keyboard_info",              0,              12 },
+	{ "",          0,          "kernel_dwmblocks",             0,               1 },
+	{ "",          0,          "sensors_dwmblocks",                    1,               0 },
+	{ "",          0,          "volume_dwmblocks",                     0,              10 },
+	{ "",          0,          "keyboard_info_dwmblocks",              0,              12 },
 	{ " ",        CMD_TIME,            0,                                       60,              2 },
-	{ "",          0,          "~/scripts/dwmblocks/date",                       0,               3 }
+	{ "",          0,          "date_dwmblocks",                       0,               3 }
 
 };
 
